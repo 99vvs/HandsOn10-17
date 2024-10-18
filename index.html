@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diabetes Prediction</title>
+</head>
+<body>
+    <h1>Diabetes Prediction</h1>
+    <form id="predictionForm" onsubmit="event.preventDefault(); makePrediction();">
+        <label for="pregnancies">Pregnancies:</label><input type="text" id="pregnancies"><br>
+        <label for="glucose">Glucose:</label><input type="text" id="glucose"><br>
+        <label for="blood_pressure">Blood Pressure:</label><input type="text" id="blood_pressure"><br>
+        <label for="skin_thickness">Skin Thickness:</label><input type="text" id="skin_thickness"><br>
+        <label for="insulin">Insulin:</label><input type="text" id="insulin"><br>
+        <label for="bmi">BMI:</label><input type="text" id="bmi"><br>
+        <label for="diabetes_pedigree">Diabetes Pedigree:</label><input type="text" id="diabetes_pedigree"><br>
+        <label for="age">Age:</label><input type="text" id="age"><br>
+        <button type="submit">Predict</button>
+    </form>
+    <p id="result"></p>
+    
+
+    <script>
+      function makePrediction() {
+    const formData = {
+        pregnancies: parseInt(document.getElementById('pregnancies').value),
+        glucose: parseInt(document.getElementById('glucose').value),
+        blood_pressure: parseInt(document.getElementById('blood_pressure').value),
+        skin_thickness: parseInt(document.getElementById('skin_thickness').value),
+        insulin: parseInt(document.getElementById('insulin').value),
+        bmi: parseFloat(document.getElementById('bmi').value),
+        diabetes_pedigree: parseFloat(document.getElementById('diabetes_pedigree').value),
+        age: parseInt(document.getElementById('age').value)
+    };
+
+    fetch('http://127.0.0.1:5500/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();  // Convert response to JSON
+    })
+    .then(data => {
+        document.getElementById('result').innerHTML = `
+            <strong>Prediction:</strong> ${data.prediction}<br>
+            <strong>Recommendation:</strong> ${JSON.stringify(data.recommendation)}
+        `;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('result').innerHTML = `Error: ${error.message}`;
+    });
+}
+
+    </script>
+</body>
+</html>
